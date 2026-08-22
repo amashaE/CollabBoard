@@ -49,7 +49,7 @@ function App() {
 
       </header>
 
-     
+      
       <div className="app-body">
 
         
@@ -189,7 +189,7 @@ function App() {
 
           </section>
 
-          
+         
           <section className="task-section">
 
             <div className="section-header">
@@ -317,6 +317,7 @@ function App() {
 
       </div>
 
+    
       <CreateTaskModal
         isOpen={isCreateTaskOpen}
         onClose={() => setIsCreateTaskOpen(false)}
