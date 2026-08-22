@@ -11,276 +11,318 @@ function App() {
     setIsCreateTaskOpen(false);
   };
 
-  return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100vh',
-        fontFamily: 'sans-serif',
-      }}
-    >
-      {/* Header */}
-      <header
-        style={{
-          height: '60px',
-          backgroundColor: '#1f2937',
-          color: '#fff',
-          display: 'flex',
-          alignItems: 'center',
-          padding: '0 20px',
-          justifyContent: 'space-between',
-        }}
-      >
-        <h2
-          style={{
-            margin: 0,
-            fontSize: '20px',
-          }}
-        >
-          CollabBoard
-        </h2>
+  const getPriorityClass = (priority) => {
+    if (priority === 'High') return 'priority-high';
+    if (priority === 'Medium') return 'priority-medium';
+    return 'priority-low';
+  };
 
-        <div>👤 User Profile</div>
+  return (
+    <div className="app-shell">
+
+     
+      <header className="top-header">
+
+        <div className="brand">
+          <div className="brand-icon">✦</div>
+          <div>
+            <h1>CollabBoard</h1>
+            <span>Team Workspace</span>
+          </div>
+        </div>
+
+        <div className="header-right">
+          <button className="notification-btn" type="button">
+            🔔
+            <span className="notification-dot"></span>
+          </button>
+
+          <div className="profile">
+            <div className="profile-avatar">M</div>
+            <div className="profile-info">
+              <strong>User Profile</strong>
+              <span>Team Member</span>
+            </div>
+            <span className="profile-arrow">⌄</span>
+          </div>
+        </div>
+
       </header>
 
-      {/* Main Layout */}
-      <div
-        style={{
-          display: 'flex',
-          flex: 1,
-        }}
-      >
-        {/* Sidebar */}
-        <aside
-          style={{
-            width: '200px',
-            backgroundColor: '#f3f4f6',
-            padding: '20px',
-            borderRight: '1px solid #e5e7eb',
-          }}
-        >
-          <ul
-            style={{
-              listStyle: 'none',
-              padding: 0,
-              margin: 0,
-            }}
-          >
-            <li
-              style={{
-                padding: '10px 0',
-                fontWeight: 'bold',
-              }}
-            >
-              📊 Dashboard
-            </li>
+     
+      <div className="app-body">
 
-            <li
-              style={{
-                padding: '10px 0',
-              }}
-            >
-              📋 Kanban Board
-            </li>
+        
+        <aside className="sidebar">
 
-            <li
-              style={{
-                padding: '10px 0',
-              }}
-            >
-              👥 Members
-            </li>
-
-            <li
-              style={{
-                padding: '10px 0',
-              }}
-            >
-              📅 Calendar
-            </li>
-          </ul>
-        </aside>
-
-        {/* Main Content */}
-        <main
-          style={{
-            flex: 1,
-            padding: '20px',
-            backgroundColor: '#fafafa',
-          }}
-        >
-          {/* Page Header */}
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
+          <div className="workspace-title">
+            <span className="workspace-icon">🚀</span>
             <div>
-              <h3
-                style={{
-                  marginBottom: '8px',
-                }}
-              >
-                Welcome to CollabBoard
-              </h3>
-
-              <p
-                style={{
-                  marginTop: 0,
-                  color: '#6b7280',
-                }}
-              >
-                Manage your team's tasks and projects.
-              </p>
+              <strong>My Workspace</strong>
+              <small>Project Management</small>
             </div>
-
-            {/* Create Task Button */}
-            <button
-              type="button"
-              onClick={() => setIsCreateTaskOpen(true)}
-              style={{
-                backgroundColor: '#2563eb',
-                color: '#ffffff',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '11px 18px',
-                fontSize: '14px',
-                fontWeight: '600',
-                cursor: 'pointer',
-              }}
-            >
-              + Create Task
-            </button>
           </div>
 
-          {/* Created Tasks */}
-          {tasks.length > 0 && (
-            <div
-              style={{
-                marginTop: '30px',
-              }}
-            >
-              <h3>Created Tasks</h3>
+          <div className="menu-section">
+            <span className="menu-label">MAIN MENU</span>
 
-              {tasks.map((task) => (
-                <div
-                  key={task.id}
-                  style={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '10px',
-                    padding: '16px',
-                    marginBottom: '12px',
-                  }}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <strong
-                      style={{
-                        fontSize: '16px',
-                        color: '#1f2937',
-                      }}
-                    >
-                      {task.title}
-                    </strong>
+            <ul className="sidebar-menu">
 
-                    <span
-                      style={{
-                        backgroundColor:
-                          task.priority === 'High'
-                            ? '#fee2e2'
-                            : task.priority === 'Medium'
-                            ? '#fef3c7'
-                            : '#dcfce7',
-                        color:
-                          task.priority === 'High'
-                            ? '#b91c1c'
-                            : task.priority === 'Medium'
-                            ? '#92400e'
-                            : '#166534',
-                        padding: '4px 10px',
-                        borderRadius: '20px',
-                        fontSize: '12px',
-                        fontWeight: '600',
-                      }}
-                    >
-                      {task.priority}
-                    </span>
-                  </div>
+              <li className="active">
+                <span>📊</span>
+                <span>Dashboard</span>
+              </li>
 
-                  {task.description && (
-                    <p
-                      style={{
-                        color: '#6b7280',
-                        fontSize: '14px',
-                        margin: '10px 0',
-                      }}
-                    >
-                      {task.description}
-                    </p>
-                  )}
+              <li>
+                <span>📋</span>
+                <span>Kanban Board</span>
+              </li>
 
-                  <div
-                    style={{
-                      display: 'flex',
-                      gap: '20px',
-                      color: '#6b7280',
-                      fontSize: '13px',
-                    }}
-                  >
-                    <span>
-                      <strong>Status:</strong> {task.status}
-                    </span>
+              <li>
+                <span>👥</span>
+                <span>Members</span>
+              </li>
 
-                    {task.assignee && (
-                      <span>
-                        <strong>Assignee:</strong> {task.assignee}
-                      </span>
-                    )}
+              <li>
+                <span>📅</span>
+                <span>Calendar</span>
+              </li>
 
-                    {task.dueDate && (
-                      <span>
-                        <strong>Due:</strong> {task.dueDate}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
+            </ul>
+          </div>
+
+          <div className="sidebar-bottom">
+
+            <div className="upgrade-card">
+              <div className="upgrade-icon">⚡</div>
+              <strong>Keep things moving!</strong>
+              <p>Create tasks and keep your team organized.</p>
+              <button type="button">Get Started →</button>
             </div>
-          )}
 
-          {/* Empty State */}
-          {tasks.length === 0 && (
-            <div
-              style={{
-                marginTop: '50px',
-                textAlign: 'center',
-                color: '#9ca3af',
-              }}
-            >
-              <p>No tasks created yet.</p>
+            <div className="sidebar-user">
+              <div className="profile-avatar small">M</div>
+              <div>
+                <strong>My Account</strong>
+                <span>Online</span>
+              </div>
+            </div>
+
+          </div>
+
+        </aside>
+
+        
+        <main className="main-content">
+
+          {/* Welcome section */}
+          <section className="welcome-section">
+
+            <div>
+              <span className="welcome-tag">✨ GOOD TO SEE YOU</span>
+
+              <h2>
+                Welcome to <span>CollabBoard</span>
+              </h2>
+
               <p>
-                Click <strong>+ Create Task</strong> to add your first task.
+                Manage your team's tasks, collaborate and keep your projects
+                moving forward.
               </p>
             </div>
-          )}
+
+            <button
+              type="button"
+              className="create-task-btn"
+              onClick={() => setIsCreateTaskOpen(true)}
+            >
+              <span>＋</span>
+              Create Task
+            </button>
+
+          </section>
+
+          
+          <section className="stats-grid">
+
+            <div className="stat-card blue">
+              <div className="stat-icon">📋</div>
+              <div>
+                <span>Total Tasks</span>
+                <strong>{tasks.length}</strong>
+              </div>
+              <div className="stat-decoration">↗</div>
+            </div>
+
+            <div className="stat-card purple">
+              <div className="stat-icon">⚡</div>
+              <div>
+                <span>In Progress</span>
+                <strong>
+                  {tasks.filter((task) => task.status === 'Doing').length}
+                </strong>
+              </div>
+              <div className="stat-decoration">↗</div>
+            </div>
+
+            <div className="stat-card green">
+              <div className="stat-icon">✓</div>
+              <div>
+                <span>Completed</span>
+                <strong>
+                  {tasks.filter((task) => task.status === 'Done').length}
+                </strong>
+              </div>
+              <div className="stat-decoration">↗</div>
+            </div>
+
+            <div className="stat-card orange">
+              <div className="stat-icon">🔥</div>
+              <div>
+                <span>High Priority</span>
+                <strong>
+                  {tasks.filter((task) => task.priority === 'High').length}
+                </strong>
+              </div>
+              <div className="stat-decoration">↗</div>
+            </div>
+
+          </section>
+
+          
+          <section className="task-section">
+
+            <div className="section-header">
+              <div>
+                <h3>Recent Tasks</h3>
+                <p>Your latest project activities</p>
+              </div>
+
+              {tasks.length > 0 && (
+                <span className="task-count">
+                  {tasks.length} {tasks.length === 1 ? 'Task' : 'Tasks'}
+                </span>
+              )}
+            </div>
+
+            
+            {tasks.length > 0 ? (
+
+              <div className="task-list">
+
+                {tasks.map((task) => (
+
+                  <div className="task-card" key={task.id}>
+
+                    <div className="task-main">
+
+                      <div className="task-check">
+                        ✓
+                      </div>
+
+                      <div className="task-content">
+
+                        <div className="task-title-row">
+
+                          <h4>{task.title}</h4>
+
+                          <span
+                            className={`priority-badge ${getPriorityClass(
+                              task.priority
+                            )}`}
+                          >
+                            {task.priority}
+                          </span>
+
+                        </div>
+
+                        {task.description && (
+                          <p>{task.description}</p>
+                        )}
+
+                        <div className="task-meta">
+
+                          <span>
+                            📌 {task.status}
+                          </span>
+
+                          {task.assignee && (
+                            <span>
+                              👤 {task.assignee}
+                            </span>
+                          )}
+
+                          {task.dueDate && (
+                            <span>
+                              📅 {task.dueDate}
+                            </span>
+                          )}
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                    <button
+                      className="task-more"
+                      type="button"
+                    >
+                      ⋮
+                    </button>
+
+                  </div>
+
+                ))}
+
+              </div>
+
+            ) : (
+
+             
+
+              <div className="empty-state">
+
+                <div className="empty-illustration">
+                  <div className="empty-circle">
+                    📝
+                  </div>
+                  <div className="floating-star star-one">✦</div>
+                  <div className="floating-star star-two">✦</div>
+                  <div className="floating-star star-three">✧</div>
+                </div>
+
+                <h3>No tasks yet</h3>
+
+                <p>
+                  Your workspace is ready! Create your first task
+                  and start organizing your project.
+                </p>
+
+                <button
+                  type="button"
+                  className="empty-create-btn"
+                  onClick={() => setIsCreateTaskOpen(true)}
+                >
+                  ＋ Create Your First Task
+                </button>
+
+              </div>
+
+            )}
+
+          </section>
+
         </main>
+
       </div>
 
-      {/* Create Task Modal */}
       <CreateTaskModal
         isOpen={isCreateTaskOpen}
         onClose={() => setIsCreateTaskOpen(false)}
         onCreate={handleCreateTask}
       />
+
     </div>
   );
 }
