@@ -68,7 +68,7 @@ const TeamMembersPanel = () => {
     },
     {
       id: 10,
-      name: 'Chathuri G.',
+      name: 'Manulji W.',
       role: 'Scrum Master',
       tasks: 4,
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Chathuri'
