@@ -1,3 +1,4 @@
+// Updated team component
 import React from 'react';
 
 const TeamMembersPanel = () => {
