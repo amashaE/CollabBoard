@@ -1,0 +1,163 @@
+.notifications-page {
+  padding: 30px;
+  background: #f5f7fb;
+  min-height: 100vh;
+}
+
+.page-title {
+  margin-bottom: 25px;
+}
+
+.page-title h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  color: #1f2937;
+}
+
+.page-title p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.notifications-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.notification-panel,
+.activity-feed {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-header h2 {
+  margin: 0 0 5px;
+  font-size: 20px;
+  color: #1f2937;
+}
+
+.section-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.mark-read-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.notification-list,
+.activity-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.notification-item {
+  display: flex;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.notification-item:last-child,
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.notification-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #eef2ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-content p {
+  margin: 0 0 5px;
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.notification-content span {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.notification-item.unread {
+  background: #f8faff;
+}
+
+.activity-item {
+  display: flex;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.activity-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #374151;
+}
+
+.activity-content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.activity-content p {
+  margin: 0;
+  font-size: 14px;
+  color: #374151;
+}
+
+.activity-details {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.activity-time {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+@media (max-width: 768px) {
+  .notifications-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .notifications-page {
+    padding: 20px;
+  }
+
+  .section-header {
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
