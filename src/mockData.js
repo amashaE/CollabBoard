@@ -120,3 +120,30 @@ export const mockNotifications = [
     time: '2 hours ago'
   }
 ];
+
+export const mockActivities = [
+  {
+    id: 1,
+    user: 'Manusha',
+    action: 'started working on Create Task Modal',
+    time: '10 mins ago'
+  },
+  {
+    id: 2,
+    user: 'Samadhi',
+    action: 'started working on Notifications & Activity',
+    time: '30 mins ago'
+  },
+  {
+    id: 3,
+    user: 'Tharunethu',
+    action: 'started working on Team Members Panel',
+    time: '1 hour ago'
+  },
+  {
+    id: 4,
+    user: 'Naduni',
+    action: 'started working on Login/Register UI',
+    time: '2 hours ago'
+  }
+];
