@@ -1,3 +1,4 @@
+// TeamMembersPanel Component
 import React from 'react';
 
 const TeamMembersPanel = () => {
