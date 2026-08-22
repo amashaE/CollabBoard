@@ -1,10 +1,23 @@
 import React, { useState } from 'react';
 import CreateTaskModal from './components/CreateTaskModal';
+import SearchFilterBar from './components/SearchFilterBar';
 import './App.css';
 
 function App() {
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [tasks, setTasks] = useState([]);
+    const [filters, setFilters] = useState({ searchText: '', priority: 'All', status: 'All' });
+
+  const visibleTasks = tasks.filter((task) => {
+    const query = filters.searchText.trim().toLowerCase();
+    const matchesSearch =
+      query === '' ||
+      task.title.toLowerCase().includes(query) ||
+      (task.description && task.description.toLowerCase().includes(query));
+    const matchesPriority = filters.priority === 'All' || task.priority === filters.priority;
+    const matchesStatus = filters.status === 'All' || task.status === filters.status;
+    return matchesSearch && matchesPriority && matchesStatus;
+  });
 
   const handleCreateTask = (newTask) => {
     setTasks((previousTasks) => [...previousTasks, newTask]);
