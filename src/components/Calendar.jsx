@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import "./Calendar.css";
-import { initialDeadlines } from "./initialDeadlin";
-
+import { initialDeadlines } from "../initialDeadlin.js";
 function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date(2026, 7, 1));
   const year = currentDate.getFullYear();
