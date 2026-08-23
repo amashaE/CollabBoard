@@ -1,31 +1,22 @@
 import React, { useState } from "react";
 import "./Calendar.css";
-
-const tasks = [
-  { id: 1, title: "Login Page", deadline: "2026-08-24", priority: "High" },
-  { id: 2, title: "Dashboard UI", deadline: "2026-08-26", priority: "Medium" },
-  { id: 3, title: "API Integration", deadline: "2026-08-28", priority: "High" },
-  { id: 4, title: "Testing", deadline: "2026-08-30", priority: "Low" },
-];
+import { initialDeadlines } from "./initialDeadlin";
 
 function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date(2026, 7, 1));
-
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-
   const monthName = currentDate.toLocaleString("default", { month: "long" });
 
   const getTasksForDay = (day) => {
     const date = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    return tasks.filter((task) => task.deadline === date);
+    return initialDeadlines.filter((task) => task.deadline === date);
   };
 
-  const calendarDays = [];
-  for (let i = 0; i < firstDay; i++) calendarDays.push(null);
-  for (let day = 1; day <= daysInMonth; day++) calendarDays.push(day);
+  const days = Array(firstDay).fill(null);
+  for (let day = 1; day <= daysInMonth; day++) days.push(day);
 
   return (
     <div className="calendar-container">
@@ -36,13 +27,11 @@ function Calendar() {
       </div>
 
       <div className="weekdays">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-          <div key={day}>{day}</div>
-        ))}
+        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => <div key={day}>{day}</div>)}
       </div>
 
       <div className="calendar-grid">
-        {calendarDays.map((day, index) => (
+        {days.map((day, index) => (
           <div className="calendar-day" key={index}>
             {day && (
               <>
@@ -62,12 +51,9 @@ function Calendar() {
 
       <div className="upcoming">
         <h2>Upcoming Deadlines</h2>
-        {tasks.map((task) => (
+        {initialDeadlines.map((task) => (
           <div className="deadline-item" key={task.id}>
-            <div>
-              <strong>{task.title}</strong>
-              <p>{task.deadline}</p>
-            </div>
+            <div><strong>{task.title}</strong><p>{task.deadline}</p></div>
             <span className={`badge ${task.priority.toLowerCase()}`}>{task.priority}</span>
           </div>
         ))}
@@ -77,3 +63,4 @@ function Calendar() {
 }
 
 export default Calendar;
+
