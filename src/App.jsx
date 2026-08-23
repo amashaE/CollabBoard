@@ -7,15 +7,12 @@ import {
 } from 'react-router-dom';
 
 import CreateTaskModal from './components/CreateTaskModal';
-feature/auth-and-profile
-import Dashboard from './Pages/Dashboard';
 import TeamMembersPanel from './components/TeamMembersPanel';
-
+import KanbanBoard from './components/KanbanBoard';
 import Notifications from './pages/Notifications';
-
-
 import './App.css';
 
+// Dashboard component defined directly inside App.jsx
 function Dashboard({ tasks, setIsCreateTaskOpen }) {
   return (
     <main
@@ -376,7 +373,7 @@ function App() {
 
           {/* Page Content */}
           <Routes>
-            {/* Dashboard */}
+            {/* Dashboard Route */}
             <Route
               path="/"
               element={
