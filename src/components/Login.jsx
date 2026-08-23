@@ -1,3 +1,4 @@
+//Loging component
 import React, { useState } from 'react';
 
 function Login({ onLogin, onSwitchToRegister }) {

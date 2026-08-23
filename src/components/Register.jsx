@@ -1,3 +1,4 @@
+// user registration
 import React, { useState } from 'react';
 
 function Register({ onRegister, onSwitchToLogin }) {
