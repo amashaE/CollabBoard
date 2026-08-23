@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import CreateTaskModal from './components/CreateTaskModal';
-
+import Dashboard from './Pages/Dashboard';
+import TeamMembersPanel from './components/TeamMembersPanel';
 import './App.css';
 
 function App() {
