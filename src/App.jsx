@@ -7,9 +7,13 @@ import {
 } from 'react-router-dom';
 
 import CreateTaskModal from './components/CreateTaskModal';
+feature/auth-and-profile
+import Dashboard from './Pages/Dashboard';
+import TeamMembersPanel from './components/TeamMembersPanel';
+
 import Notifications from './pages/Notifications';
 import TeamMembersPanel from './components/TeamMembersPanel';
-import KanbanBoard from './components/KanbanBoard';
+
 import './App.css';
 
 function Dashboard({ tasks, setIsCreateTaskOpen }) {
