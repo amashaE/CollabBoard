@@ -1,23 +1,11 @@
 import React, { useState } from 'react';
 import CreateTaskModal from './components/CreateTaskModal';
-import SearchFilterBar from './components/SearchFilterBar';
+
 import './App.css';
 
 function App() {
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
-  const [tasks, setTasks] = useState([]);
-    const [filters, setFilters] = useState({ searchText: '', priority: 'All', status: 'All' });
 
-  const visibleTasks = tasks.filter((task) => {
-    const query = filters.searchText.trim().toLowerCase();
-    const matchesSearch =
-      query === '' ||
-      task.title.toLowerCase().includes(query) ||
-      (task.description && task.description.toLowerCase().includes(query));
-    const matchesPriority = filters.priority === 'All' || task.priority === filters.priority;
-    const matchesStatus = filters.status === 'All' || task.status === filters.status;
-    return matchesSearch && matchesPriority && matchesStatus;
-  });
 
   const handleCreateTask = (newTask) => {
     setTasks((previousTasks) => [...previousTasks, newTask]);
@@ -38,7 +26,7 @@ function App() {
         style={{
           height: '60px',
           backgroundColor: '#1f2937',
-          color: '#fff',
+          color: '#ffffff',
           display: 'flex',
           alignItems: 'center',
           padding: '0 20px',
@@ -121,36 +109,17 @@ function App() {
             flex: 1,
             padding: '20px',
             backgroundColor: '#fafafa',
+            overflowY: 'auto',
           }}
         >
-          {/* Page Header */}
+          {/* Create Task Button */}
           <div
             style={{
               display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              justifyContent: 'flex-end',
+              marginBottom: '20px',
             }}
           >
-            <div>
-              <h3
-                style={{
-                  marginBottom: '8px',
-                }}
-              >
-                Welcome to CollabBoard
-              </h3>
-
-              <p
-                style={{
-                  marginTop: 0,
-                  color: '#6b7280',
-                }}
-              >
-                Manage your team's tasks and projects.
-              </p>
-            </div>
-
-            {/* Create Task Button */}
             <button
               type="button"
               onClick={() => setIsCreateTaskOpen(true)}
@@ -169,122 +138,8 @@ function App() {
             </button>
           </div>
 
-          {/* Created Tasks */}
-          {tasks.length > 0 && (
-            <div
-              style={{
-                marginTop: '30px',
-              }}
-            >
-              <h3>Created Tasks</h3>
-
-              {tasks.map((task) => (
-                <div
-                  key={task.id}
-                  style={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '10px',
-                    padding: '16px',
-                    marginBottom: '12px',
-                  }}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <strong
-                      style={{
-                        fontSize: '16px',
-                        color: '#1f2937',
-                      }}
-                    >
-                      {task.title}
-                    </strong>
-
-                    <span
-                      style={{
-                        backgroundColor:
-                          task.priority === 'High'
-                            ? '#fee2e2'
-                            : task.priority === 'Medium'
-                            ? '#fef3c7'
-                            : '#dcfce7',
-                        color:
-                          task.priority === 'High'
-                            ? '#b91c1c'
-                            : task.priority === 'Medium'
-                            ? '#92400e'
-                            : '#166534',
-                        padding: '4px 10px',
-                        borderRadius: '20px',
-                        fontSize: '12px',
-                        fontWeight: '600',
-                      }}
-                    >
-                      {task.priority}
-                    </span>
-                  </div>
-
-                  {task.description && (
-                    <p
-                      style={{
-                        color: '#6b7280',
-                        fontSize: '14px',
-                        margin: '10px 0',
-                      }}
-                    >
-                      {task.description}
-                    </p>
-                  )}
-
-                  <div
-                    style={{
-                      display: 'flex',
-                      gap: '20px',
-                      color: '#6b7280',
-                      fontSize: '13px',
-                    }}
-                  >
-                    <span>
-                      <strong>Status:</strong> {task.status}
-                    </span>
-
-                    {task.assignee && (
-                      <span>
-                        <strong>Assignee:</strong> {task.assignee}
-                      </span>
-                    )}
-
-                    {task.dueDate && (
-                      <span>
-                        <strong>Due:</strong> {task.dueDate}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Empty State */}
-          {tasks.length === 0 && (
-            <div
-              style={{
-                marginTop: '50px',
-                textAlign: 'center',
-                color: '#9ca3af',
-              }}
-            >
-              <p>No tasks created yet.</p>
-              <p>
-                Click <strong>+ Create Task</strong> to add your first task.
-              </p>
-            </div>
-          )}
+          {/* Member 1 Dashboard */}
+          <Dashboard tasks={tasks} />
         </main>
       </div>
 
