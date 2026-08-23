@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import CreateTaskModal from './components/CreateTaskModal';
-import Dashboard from './Pages/Dashboard';
-import { mockTasks } from './mockData';
+
 import './App.css';
 
 function App() {
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
-  const [tasks, setTasks] = useState(mockTasks);
+
 
   const handleCreateTask = (newTask) => {
     setTasks((previousTasks) => [...previousTasks, newTask]);
