@@ -7,6 +7,25 @@ import {
 } from 'react-router-dom';
 
 import CreateTaskModal from './components/CreateTaskModal';
+<<<<<<< HEAD
+<<<<<<< HEAD
+import KanbanBoard from './components/KanbanBoard';
+import TeamMembersPanel from './components/TeamMembersPanel';
+import Notifications from './Pages/Notifications';
+import DashboardPage from './Pages/Dashboard';
+=======
+feature/auth-and-profile
+import Dashboard from './Pages/Dashboard';
+
+
+import Notifications from './pages/Notifications';
+
+>>>>>>> d60129d (Fix duplicate TeamMembersPanel import error)
+
+import './App.css';
+
+function DashboardContent({ tasks, setIsCreateTaskOpen }) {
+=======
 import TeamMembersPanel from './components/TeamMembersPanel';
 import KanbanBoard from './components/KanbanBoard';
 import Notifications from './pages/Notifications';
@@ -14,6 +33,7 @@ import './App.css';
 
 // Dashboard component defined directly inside App.jsx
 function Dashboard({ tasks, setIsCreateTaskOpen }) {
+>>>>>>> 2f52257b69d0417c0d3ab1214a3ab531f00c1648
   return (
     <main
       style={{
@@ -23,7 +43,6 @@ function Dashboard({ tasks, setIsCreateTaskOpen }) {
         overflowY: 'auto',
       }}
     >
-      {/* Page Header */}
       <div
         style={{
           display: 'flex',
@@ -46,7 +65,6 @@ function Dashboard({ tasks, setIsCreateTaskOpen }) {
           </p>
         </div>
 
-        {/* Create Task Button */}
         <button
           type="button"
           onClick={() => setIsCreateTaskOpen(true)}
@@ -65,8 +83,7 @@ function Dashboard({ tasks, setIsCreateTaskOpen }) {
         </button>
       </div>
 
-      {/* Created Tasks */}
-      {tasks.length > 0 && (
+      {tasks.length > 0 ? (
         <div style={{ marginTop: '30px' }}>
           <h3>Created Tasks</h3>
 
@@ -162,10 +179,7 @@ function Dashboard({ tasks, setIsCreateTaskOpen }) {
             </div>
           ))}
         </div>
-      )}
-
-      {/* Empty State */}
-      {tasks.length === 0 && (
+      ) : (
         <div
           style={{
             marginTop: '50px',
@@ -226,7 +240,11 @@ function App() {
           fontFamily: 'sans-serif',
         }}
       >
+<<<<<<< HEAD
+        {/* HEADER */}
+=======
         {/* Header */}
+>>>>>>> 2f52257b69d0417c0d3ab1214a3ab531f00c1648
         <header
           style={{
             height: '60px',
@@ -254,21 +272,26 @@ function App() {
               gap: '20px',
             }}
           >
+<<<<<<< HEAD
+            {/* NOTIFICATION BUTTON */}
+=======
             {/* Notification Button */}
+>>>>>>> 2f52257b69d0417c0d3ab1214a3ab531f00c1648
             <NavLink
               to="/notifications"
-              style={{
+              style={({ isActive }) => ({
                 color: '#ffffff',
                 textDecoration: 'none',
                 fontSize: '24px',
                 position: 'relative',
-              }}
+                opacity: isActive ? 1 : 0.9,
+              })}
               title="Notifications"
             >
               🔔
             </NavLink>
 
-            {/* User Profile */}
+            {/* PROFILE */}
             <NavLink
               to="/profile"
               style={({ isActive }) => ({
@@ -282,14 +305,22 @@ function App() {
           </div>
         </header>
 
+<<<<<<< HEAD
+        {/* MAIN LAYOUT */}
+=======
         {/* Main Layout */}
+>>>>>>> 2f52257b69d0417c0d3ab1214a3ab531f00c1648
         <div
           style={{
             display: 'flex',
             flex: 1,
           }}
         >
+<<<<<<< HEAD
+          {/* SIDEBAR */}
+=======
           {/* Sidebar */}
+>>>>>>> 2f52257b69d0417c0d3ab1214a3ab531f00c1648
           <aside
             style={{
               width: '200px',
@@ -305,7 +336,11 @@ function App() {
                 margin: 0,
               }}
             >
+<<<<<<< HEAD
+              {/* DASHBOARD */}
+=======
               {/* Dashboard */}
+>>>>>>> 2f52257b69d0417c0d3ab1214a3ab531f00c1648
               <li style={{ marginBottom: '10px' }}>
                 <NavLink
                   to="/"
@@ -321,7 +356,7 @@ function App() {
                 </NavLink>
               </li>
 
-              {/* Kanban Board */}
+              {/* KANBAN */}
               <li style={{ marginBottom: '10px' }}>
                 <NavLink
                   to="/board"
@@ -337,7 +372,7 @@ function App() {
                 </NavLink>
               </li>
 
-              {/* Members */}
+              {/* MEMBERS */}
               <li style={{ marginBottom: '10px' }}>
                 <NavLink
                   to="/members"
@@ -353,7 +388,7 @@ function App() {
                 </NavLink>
               </li>
 
-              {/* Calendar */}
+              {/* CALENDAR */}
               <li style={{ marginBottom: '10px' }}>
                 <NavLink
                   to="/calendar"
@@ -371,26 +406,36 @@ function App() {
             </ul>
           </aside>
 
+<<<<<<< HEAD
+          {/* PAGE CONTENT */}
+          <Routes>
+            {/* DASHBOARD */}
+=======
           {/* Page Content */}
           <Routes>
             {/* Dashboard Route */}
+>>>>>>> 2f52257b69d0417c0d3ab1214a3ab531f00c1648
             <Route
               path="/"
               element={
-                <Dashboard
+                <DashboardContent
                   tasks={tasks}
                   setIsCreateTaskOpen={setIsCreateTaskOpen}
                 />
               }
             />
 
-            {/* Notifications */}
+            {/* NOTIFICATIONS */}
             <Route
               path="/notifications"
               element={<Notifications />}
             />
 
+<<<<<<< HEAD
+            {/* KANBAN BOARD */}
+=======
             {/* Integrated Kanban Board */}
+>>>>>>> 2f52257b69d0417c0d3ab1214a3ab531f00c1648
             <Route
               path="/board"
               element={
@@ -407,31 +452,42 @@ function App() {
               }
             />
 
-            {/* Team Members */}
+            {/* TEAM MEMBERS */}
             <Route
               path="/members"
-              element={<TeamMembersPanel />}
+              element={
+                <main
+                  style={{
+                    flex: 1,
+                    padding: '20px',
+                    backgroundColor: '#fafafa',
+                    overflowY: 'auto',
+                  }}
+                >
+                  <TeamMembersPanel />
+                </main>
+              }
             />
 
-            {/* Temporary Calendar */}
+            {/* CALENDAR */}
             <Route
               path="/calendar"
-              element={
-                <PlaceholderPage title="Calendar" />
-              }
+              element={<PlaceholderPage title="Calendar" />}
             />
 
-            {/* Temporary Profile */}
+            {/* PROFILE */}
             <Route
               path="/profile"
-              element={
-                <PlaceholderPage title="Profile" />
-              }
+              element={<PlaceholderPage title="Profile" />}
             />
           </Routes>
         </div>
 
+<<<<<<< HEAD
+        {/* CREATE TASK MODAL */}
+=======
         {/* Create Task Modal */}
+>>>>>>> 2f52257b69d0417c0d3ab1214a3ab531f00c1648
         <CreateTaskModal
           isOpen={isCreateTaskOpen}
           onClose={() => setIsCreateTaskOpen(false)}
