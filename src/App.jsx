@@ -12,7 +12,7 @@ import Dashboard from './Pages/Dashboard';
 import TeamMembersPanel from './components/TeamMembersPanel';
 
 import Notifications from './pages/Notifications';
-import TeamMembersPanel from './components/TeamMembersPanel';
+
 
 import './App.css';
 
