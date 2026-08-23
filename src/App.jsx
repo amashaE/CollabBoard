@@ -9,7 +9,7 @@ import {
 import CreateTaskModal from './components/CreateTaskModal';
 import Notifications from './pages/Notifications';
 import TeamMembersPanel from './components/TeamMembersPanel';
-
+import KanbanBoard from './components/KanbanBoard';
 import './App.css';
 
 function Dashboard({ tasks, setIsCreateTaskOpen }) {
@@ -183,7 +183,6 @@ function Dashboard({ tasks, setIsCreateTaskOpen }) {
   );
 }
 
-
 function PlaceholderPage({ title }) {
   return (
     <main
@@ -202,7 +201,6 @@ function PlaceholderPage({ title }) {
     </main>
   );
 }
-
 
 function App() {
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
@@ -227,7 +225,6 @@ function App() {
           fontFamily: 'sans-serif',
         }}
       >
-
         {/* Header */}
         <header
           style={{
@@ -256,7 +253,6 @@ function App() {
               gap: '20px',
             }}
           >
-
             {/* Notification Button */}
             <NavLink
               to="/notifications"
@@ -282,10 +278,8 @@ function App() {
             >
               👤 Profile
             </NavLink>
-
           </div>
         </header>
-
 
         {/* Main Layout */}
         <div
@@ -294,7 +288,6 @@ function App() {
             flex: 1,
           }}
         >
-
           {/* Sidebar */}
           <aside
             style={{
@@ -311,7 +304,6 @@ function App() {
                 margin: 0,
               }}
             >
-
               {/* Dashboard */}
               <li style={{ marginBottom: '10px' }}>
                 <NavLink
@@ -375,14 +367,11 @@ function App() {
                   📅 Calendar
                 </NavLink>
               </li>
-
             </ul>
           </aside>
 
-
           {/* Page Content */}
           <Routes>
-
             {/* Dashboard */}
             <Route
               path="/"
@@ -400,11 +389,20 @@ function App() {
               element={<Notifications />}
             />
 
-            {/* Temporary Kanban Board */}
+            {/* Integrated Kanban Board */}
             <Route
               path="/board"
               element={
-                <PlaceholderPage title="Kanban Board" />
+                <main
+                  style={{
+                    flex: 1,
+                    padding: '20px',
+                    backgroundColor: '#fafafa',
+                    overflowY: 'auto',
+                  }}
+                >
+                  <KanbanBoard />
+                </main>
               }
             />
 
@@ -429,10 +427,8 @@ function App() {
                 <PlaceholderPage title="Profile" />
               }
             />
-
           </Routes>
         </div>
-
 
         {/* Create Task Modal */}
         <CreateTaskModal
@@ -440,7 +436,6 @@ function App() {
           onClose={() => setIsCreateTaskOpen(false)}
           onCreate={handleCreateTask}
         />
-
       </div>
     </BrowserRouter>
   );
