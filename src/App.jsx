@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom';
 
 import CreateTaskModal from './components/CreateTaskModal';
+<<<<<<< HEAD
 import KanbanBoard from './components/KanbanBoard';
 import TeamMembersPanel from './components/TeamMembersPanel';
 import Notifications from './Pages/Notifications';
@@ -15,6 +16,15 @@ import DashboardPage from './Pages/Dashboard';
 import './App.css';
 
 function DashboardContent({ tasks, setIsCreateTaskOpen }) {
+=======
+import TeamMembersPanel from './components/TeamMembersPanel';
+import KanbanBoard from './components/KanbanBoard';
+import Notifications from './pages/Notifications';
+import './App.css';
+
+// Dashboard component defined directly inside App.jsx
+function Dashboard({ tasks, setIsCreateTaskOpen }) {
+>>>>>>> 2f52257b69d0417c0d3ab1214a3ab531f00c1648
   return (
     <main
       style={{
@@ -221,7 +231,11 @@ function App() {
           fontFamily: 'sans-serif',
         }}
       >
+<<<<<<< HEAD
         {/* HEADER */}
+=======
+        {/* Header */}
+>>>>>>> 2f52257b69d0417c0d3ab1214a3ab531f00c1648
         <header
           style={{
             height: '60px',
@@ -249,7 +263,11 @@ function App() {
               gap: '20px',
             }}
           >
+<<<<<<< HEAD
             {/* NOTIFICATION BUTTON */}
+=======
+            {/* Notification Button */}
+>>>>>>> 2f52257b69d0417c0d3ab1214a3ab531f00c1648
             <NavLink
               to="/notifications"
               style={({ isActive }) => ({
@@ -278,14 +296,22 @@ function App() {
           </div>
         </header>
 
+<<<<<<< HEAD
         {/* MAIN LAYOUT */}
+=======
+        {/* Main Layout */}
+>>>>>>> 2f52257b69d0417c0d3ab1214a3ab531f00c1648
         <div
           style={{
             display: 'flex',
             flex: 1,
           }}
         >
+<<<<<<< HEAD
           {/* SIDEBAR */}
+=======
+          {/* Sidebar */}
+>>>>>>> 2f52257b69d0417c0d3ab1214a3ab531f00c1648
           <aside
             style={{
               width: '200px',
@@ -301,7 +327,11 @@ function App() {
                 margin: 0,
               }}
             >
+<<<<<<< HEAD
               {/* DASHBOARD */}
+=======
+              {/* Dashboard */}
+>>>>>>> 2f52257b69d0417c0d3ab1214a3ab531f00c1648
               <li style={{ marginBottom: '10px' }}>
                 <NavLink
                   to="/"
@@ -367,9 +397,15 @@ function App() {
             </ul>
           </aside>
 
+<<<<<<< HEAD
           {/* PAGE CONTENT */}
           <Routes>
             {/* DASHBOARD */}
+=======
+          {/* Page Content */}
+          <Routes>
+            {/* Dashboard Route */}
+>>>>>>> 2f52257b69d0417c0d3ab1214a3ab531f00c1648
             <Route
               path="/"
               element={
@@ -386,7 +422,11 @@ function App() {
               element={<Notifications />}
             />
 
+<<<<<<< HEAD
             {/* KANBAN BOARD */}
+=======
+            {/* Integrated Kanban Board */}
+>>>>>>> 2f52257b69d0417c0d3ab1214a3ab531f00c1648
             <Route
               path="/board"
               element={
@@ -434,7 +474,11 @@ function App() {
           </Routes>
         </div>
 
+<<<<<<< HEAD
         {/* CREATE TASK MODAL */}
+=======
+        {/* Create Task Modal */}
+>>>>>>> 2f52257b69d0417c0d3ab1214a3ab531f00c1648
         <CreateTaskModal
           isOpen={isCreateTaskOpen}
           onClose={() => setIsCreateTaskOpen(false)}
