@@ -8,10 +8,19 @@ import {
 
 import CreateTaskModal from './components/CreateTaskModal';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import KanbanBoard from './components/KanbanBoard';
 import TeamMembersPanel from './components/TeamMembersPanel';
 import Notifications from './Pages/Notifications';
 import DashboardPage from './Pages/Dashboard';
+=======
+feature/auth-and-profile
+import Dashboard from './Pages/Dashboard';
+
+
+import Notifications from './pages/Notifications';
+
+>>>>>>> d60129d (Fix duplicate TeamMembersPanel import error)
 
 import './App.css';
 
