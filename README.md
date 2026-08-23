@@ -1,16 +1,29 @@
-# React + Vite
+# Calendar / Deadlines
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Calendar / Deadlines feature for the CollabBoard team task board.
 
-Currently, two official plugins are available:
+## Files
+- `Calendar.jsx` - Calendar UI and deadline display
+- `Calendar.css` - Styling and responsive layout
+- `initialDeadlin.js` - Initial mock deadline data
+- `App.jsx` - Example entry point
+- `README.md` - Documentation
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
+- Monthly calendar view
+- Previous/next month navigation
+- Tasks displayed on deadline dates
+- Priority indicators
+- Upcoming deadlines
+- Responsive layout
 
-## React Compiler
+## Integration
+If the main project already has an `App.jsx`, do not replace the team's existing file. Import the Calendar component into the existing App instead:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```jsx
+import Calendar from "./components/Calendar/Calendar";
+```
 
-## Expanding the ESLint configuration
+Then render `<Calendar />`.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+The sample data can later be replaced with the group's shared `mockData.js` or backend data.
