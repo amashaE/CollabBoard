@@ -14,10 +14,12 @@ app.use(express.json());
 // Routes
 app.use('/api/tasks', taskRoutes);
 
+// Root Health Check Route
 app.get('/', (req, res) => {
-  res.send('SyncBoard API is running...');
+  res.send('SyncBoard REST API is running...');
 });
 
+// Start Server
 app.listen(PORT, () => {
-  console.log(`Backend server running on http://localhost:5173`);
+console.log(`Server running on http://localhost:${PORT}`);
 });
