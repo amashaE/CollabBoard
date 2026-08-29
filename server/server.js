@@ -22,4 +22,7 @@ app.get('/', (req, res) => {
 // Start Server
 app.listen(PORT, () => {
 console.log(`Server running on http://localhost:${PORT}`);
-});
+// Fix: Use the PORT variable in the console log
+app.listen(PORT, () => {
+  console.log(`Backend server running on http://localhost:${PORT}`);
+    });
