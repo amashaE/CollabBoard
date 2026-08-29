@@ -22,7 +22,7 @@ function ActivityFeed({ activities }) {
               </p>
 
               <span className="activity-time">
-                {activity.time}
+                {activity.createdAt}
               </span>
             </div>
           </div>

@@ -3,7 +3,8 @@ const cors = require('cors');
 require('dotenv').config();
 
 const taskRoutes = require('./routes/taskRoutes');
-const dashboardRoutes = require('./routes/dashboardRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+const activityRoutes = require('./routes/activityRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -14,7 +15,8 @@ app.use(express.json());
 
 // Routes
 app.use('/api/tasks', taskRoutes);
-app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/activity', activityRoutes);
 
 // Root Health Check Route
 app.get('/', (req, res) => {
@@ -25,11 +27,11 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
 
   console.log(`Backend server running on http://localhost:${PORT}`);
-});
+})
 
 console.log(`Server running on http://localhost:${PORT}`);
 // Fix: Use the PORT variable in the console log
 app.listen(PORT, () => {
   console.log(`Backend server running on http://localhost:${PORT}`);
     });
- main
+
