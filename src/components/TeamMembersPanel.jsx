@@ -1,80 +1,48 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const TeamMembersPanel = () => {
-  // Sample mock data for 10 team members
-  const members = [
-    {
-      id: 1,
-      name: 'Amasha E.',
-      role: 'Project Lead',
-      tasks: 8,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Amasha',
-    },
-    {
-      id: 2,
-      name: 'Tharunethu T.',
-      role: 'Frontend Developer',
-      tasks: 5,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Tharunethu',
-    },
-    {
-      id: 3,
-      name: 'Manu C.',
-      role: 'UI/UX Designer',
-      tasks: 6,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Manu',
-    },
-    {
-      id: 4,
-      name: 'Basuru M.',
-      role: 'Backend Developer',
-      tasks: 7,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kavindu',
-    },
-    {
-      id: 5,
-      name: 'Naduni R.',
-      role: 'QA Engineer',
-      tasks: 4,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Dilini',
-    },
-    {
-      id: 6,
-      name: 'Maleesha W.',
-      role: 'DevOps Engineer',
-      tasks: 3,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nipuna',
-    },
-    {
-      id: 7,
-      name: 'Samadhi.',
-      role: 'Full Stack Developer',
-      tasks: 9,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Shehan',
-    },
-    {
-      id: 8,
-      name: 'Devindi.',
-      role: 'Product Owner',
-      tasks: 2,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rashmi',
-    },
-    {
-      id: 9,
-      name: 'chamod.',
-      role: 'Database Administrator',
-      tasks: 5,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Oshadha',
-    },
-    {
-      id: 10,
-      name: 'Manulji W.',
-      role: 'Scrum Master',
-      tasks: 4,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Chathuri',
-    },
-  ];
+  // 1. State for dynamic API data, loading state, and error handling
+  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  // 2. Fetch live team data from Node/Express API on component mount
+  useEffect(() => {
+    fetch('http://localhost:5000/api/team')
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Failed to fetch team members');
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setMembers(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
+
+  // 3. Render loading and error states gracefully
+  if (loading) {
+    return (
+      <div style={{ padding: '20px', maxWidth: '400px', margin: '10px' }}>
+        Loading team members...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ padding: '20px', color: 'red', maxWidth: '400px', margin: '10px' }}>
+        Error: {error}
+      </div>
+    );
+  }
+
+  // 4. Render identical UI structure using API data
   return (
     <div
       style={{
