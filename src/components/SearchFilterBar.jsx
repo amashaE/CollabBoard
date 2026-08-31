@@ -1,5 +1,44 @@
-import React, { useState } from 'react';
-import './SearchFilterBar.css';
+import { useState, useEffect } from 'react';
+
+const SearchAndFilter = ({ onFilterChange }) => {
+  const [search, setSearch] = useState('');
+  const [priority, setPriority] = useState('All');
+  const [status, setStatus] = useState('All');
+
+  useEffect(() => {
+    const fetchFilteredTasks = async () => {
+      const queryParams = new URLSearchParams({ search, priority, status }).toString();
+      const response = await fetch(`http://localhost:5000/api/tasks?${queryParams}`);
+      const data = await response.json();
+      onFilterChange(data);
+    };
+
+    fetchFilteredTasks();
+  }, [search, priority, status]);
+
+  return (
+    <div className="filter-bar">
+      <input 
+        type="text" 
+        placeholder="Search tasks..." 
+        value={search} 
+        onChange={(e) => setSearch(e.target.value)} 
+      />
+      <select value={priority} onChange={(e) => setPriority(e.target.value)}>
+        <option value="All">All Priorities</option>
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
+      </select>
+      <select value={status} onChange={(e) => setStatus(e.target.value)}>
+        <option value="All">All Statuses</option>
+        <option value="To Do">To Do</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Done">Done</option>
+      </select>
+    </div>
+  );
+};
 
 function SearchFilterBar({ onFilterChange }) {
   const [searchText, setSearchText] = useState('');
