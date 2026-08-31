@@ -1,95 +1,198 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TaskDetailsModal from './TaskDetailsModal';
-
-const initialTasks = [
-  {
-    id: 1,
-    title: 'Design Auth Screens',
-    description: 'Create responsive login and registration screens.',
-    category: 'UI/UX',
-    priority: 'High',
-    status: 'To Do',
-    assignee: 'Devindi',
-    date: '2026-08-25',
-  },
-  {
-    id: 2,
-    title: 'Setup MySQL Database',
-    description: 'Create and configure the MySQL database for the project.',
-    category: 'Backend',
-    priority: 'High',
-    status: 'In Progress',
-    assignee: 'Chamod',
-    date: '2026-08-26',
-  },
-  {
-    id: 3,
-    title: 'Create Activity Feed Component',
-    description: 'Build the activity feed component for the dashboard.',
-    category: 'Frontend',
-    priority: 'Medium',
-    status: 'Done',
-    assignee: 'Tharunethu',
-    date: '2026-08-24',
-  },
-  {
-    id: 4,
-    title: 'Integrate Notification API',
-    description: 'Connect the notification system to the application.',
-    category: 'Frontend',
-    priority: 'Low',
-    status: 'To Do',
-    assignee: 'Amasha',
-    date: '2026-08-28',
-  },
-];
 
 const columns = ['To Do', 'In Progress', 'Done'];
 
-function KanbanBoard() {
-  const [tasks, setTasks] = useState(initialTasks);
+function KanbanBoard({ tasks: externalTasks, onTasksChange }) {
+  const [tasks, setTasks] = useState(externalTasks || []);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const moveTask = (taskId, direction) => {
-    setTasks((previousTasks) =>
-      previousTasks.map((task) => {
-        if (task.id === taskId) {
-          const currentIndex = columns.indexOf(task.status);
-          const nextIndex = currentIndex + direction;
+  // Get tasks from backend
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        setLoading(true);
 
-          if (nextIndex >= 0 && nextIndex < columns.length) {
-            return {
-              ...task,
-              status: columns[nextIndex],
-            };
-          }
+        const response = await fetch('http://localhost:5000/api/tasks');
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch tasks');
         }
-        return task;
-      })
-    );
+
+        const data = await response.json();
+
+        setTasks(data);
+
+        if (onTasksChange) {
+          onTasksChange(data);
+        }
+
+        setError('');
+      } catch (err) {
+        console.error('Error fetching tasks:', err);
+        setError('Could not load tasks from the backend.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTasks();
+  }, [onTasksChange]);
+
+  // Update local tasks if parent sends new tasks
+  useEffect(() => {
+    if (externalTasks) {
+      setTasks(externalTasks);
+    }
+  }, [externalTasks]);
+
+  const moveTask = async (taskId, direction) => {
+    const currentTask = tasks.find((task) => task.id === taskId);
+
+    if (!currentTask) {
+      return;
+    }
+
+    const currentIndex = columns.indexOf(currentTask.status);
+    const nextIndex = currentIndex + direction;
+
+    if (nextIndex < 0 || nextIndex >= columns.length) {
+      return;
+    }
+
+    const updatedTask = {
+      ...currentTask,
+      status: columns[nextIndex],
+    };
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/tasks/${taskId}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            status: updatedTask.status,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to update task');
+      }
+
+      const savedTask = await response.json();
+
+      const updatedTasks = tasks.map((task) =>
+        task.id === taskId ? savedTask : task
+      );
+
+      setTasks(updatedTasks);
+
+      if (onTasksChange) {
+        onTasksChange(updatedTasks);
+      }
+    } catch (err) {
+      console.error('Error moving task:', err);
+      alert('Could not update the task.');
+    }
   };
 
-  const handleSaveTask = (updatedTask) => {
-    setTasks((previousTasks) =>
-      previousTasks.map((task) =>
-        task.id === updatedTask.id ? updatedTask : task
-      )
-    );
-    setSelectedTask(null);
+  const handleSaveTask = async (updatedTask) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/tasks/${updatedTask.id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedTask),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to update task');
+      }
+
+      const savedTask = await response.json();
+
+      const updatedTasks = tasks.map((task) =>
+        task.id === savedTask.id ? savedTask : task
+      );
+
+      setTasks(updatedTasks);
+
+      if (onTasksChange) {
+        onTasksChange(updatedTasks);
+      }
+
+      setSelectedTask(null);
+    } catch (err) {
+      console.error('Error saving task:', err);
+      alert('Could not save task changes.');
+    }
   };
 
   const getPriorityBadgeStyle = (priority) => {
     switch (priority) {
       case 'High':
-        return { backgroundColor: '#fee2e2', color: '#b91c1c' };
+        return {
+          backgroundColor: '#fee2e2',
+          color: '#b91c1c',
+        };
+
       case 'Medium':
-        return { backgroundColor: '#fef3c7', color: '#92400e' };
+        return {
+          backgroundColor: '#fef3c7',
+          color: '#92400e',
+        };
+
       case 'Low':
-        return { backgroundColor: '#dcfce7', color: '#166534' };
+        return {
+          backgroundColor: '#dcfce7',
+          color: '#166534',
+        };
+
       default:
-        return { backgroundColor: '#f3f4f6', color: '#374151' };
+        return {
+          backgroundColor: '#f3f4f6',
+          color: '#374151',
+        };
     }
   };
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          padding: '40px',
+          textAlign: 'center',
+          color: '#6b7280',
+        }}
+      >
+        Loading tasks...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div
+        style={{
+          padding: '40px',
+          textAlign: 'center',
+          color: '#b91c1c',
+        }}
+      >
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div
@@ -99,7 +202,6 @@ function KanbanBoard() {
         minHeight: '100%',
       }}
     >
-      {/* Page Header */}
       <div
         style={{
           display: 'flex',
@@ -109,16 +211,28 @@ function KanbanBoard() {
         }}
       >
         <div>
-          <h2 style={{ margin: 0, color: '#111827', fontSize: '22px' }}>
+          <h2
+            style={{
+              margin: 0,
+              color: '#111827',
+              fontSize: '22px',
+            }}
+          >
             📋 Kanban Task Board
           </h2>
-          <p style={{ margin: '6px 0 0', color: '#6b7280', fontSize: '14px' }}>
+
+          <p
+            style={{
+              margin: '6px 0 0',
+              color: '#6b7280',
+              fontSize: '14px',
+            }}
+          >
             Click a task to view or edit its details.
           </p>
         </div>
       </div>
 
-      {/* Kanban Columns */}
       <div
         style={{
           display: 'grid',
@@ -127,7 +241,9 @@ function KanbanBoard() {
         }}
       >
         {columns.map((column) => {
-          const columnTasks = tasks.filter((task) => task.status === column);
+          const columnTasks = tasks.filter(
+            (task) => task.status === column
+          );
 
           return (
             <div
@@ -140,7 +256,6 @@ function KanbanBoard() {
                 minHeight: '400px',
               }}
             >
-              {/* Column Header */}
               <div
                 style={{
                   display: 'flex',
@@ -149,9 +264,16 @@ function KanbanBoard() {
                   marginBottom: '16px',
                 }}
               >
-                <h3 style={{ margin: 0, fontSize: '15px', color: '#374151' }}>
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: '15px',
+                    color: '#374151',
+                  }}
+                >
                   {column}
                 </h3>
+
                 <span
                   style={{
                     backgroundColor: '#e5e7eb',
@@ -165,7 +287,6 @@ function KanbanBoard() {
                 </span>
               </div>
 
-              {/* Task Cards */}
               {columnTasks.map((task) => (
                 <div
                   key={task.id}
@@ -178,10 +299,8 @@ function KanbanBoard() {
                     marginBottom: '12px',
                     boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
                     cursor: 'pointer',
-                    transition: 'box-shadow 0.2s',
                   }}
                 >
-                  {/* Task Title + Priority */}
                   <div
                     style={{
                       display: 'flex',
@@ -215,7 +334,6 @@ function KanbanBoard() {
                     </span>
                   </div>
 
-                  {/* Category */}
                   <div
                     style={{
                       fontSize: '12px',
@@ -223,10 +341,9 @@ function KanbanBoard() {
                       marginBottom: '10px',
                     }}
                   >
-                    {task.category}
+                    {task.category || 'General'}
                   </div>
 
-                  {/* Assignee + Move Buttons */}
                   <div
                     style={{
                       display: 'flex',
@@ -237,9 +354,14 @@ function KanbanBoard() {
                       marginTop: '12px',
                     }}
                   >
-                    <span>👤 {task.assignee}</span>
+                    <span>👤 {task.assignee || 'Unassigned'}</span>
 
-                    <div style={{ display: 'flex', gap: '4px' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: '4px',
+                      }}
+                    >
                       {column !== 'To Do' && (
                         <button
                           type="button"
@@ -282,7 +404,6 @@ function KanbanBoard() {
                     </div>
                   </div>
 
-                  {/* Click hint */}
                   <div
                     style={{
                       marginTop: '10px',
@@ -297,7 +418,6 @@ function KanbanBoard() {
                 </div>
               ))}
 
-              {/* Empty Column */}
               {columnTasks.length === 0 && (
                 <div
                   style={{
@@ -315,7 +435,6 @@ function KanbanBoard() {
         })}
       </div>
 
-      {/* Task Details Modal */}
       <TaskDetailsModal
         task={selectedTask}
         isOpen={selectedTask !== null}
