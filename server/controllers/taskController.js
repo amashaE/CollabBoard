@@ -1,10 +1,38 @@
-let { tasks } = require('../data/mockStore');
+const mockStore = require('../data/mockStore');
 
 // @desc    Get all tasks
 // @route   GET /api/tasks
 exports.getAllTasks = (req, res) => {
   try {
-    res.status(200).json(tasks);
+    let { search, priority, status } = req.query;
+
+    let filteredTasks = [...mockStore.tasks];
+
+    // Search by title or description
+    if (search) {
+      const term = search.toLowerCase();
+
+      filteredTasks = filteredTasks.filter((task) =>
+        task.title.toLowerCase().includes(term) ||
+        (task.description || '').toLowerCase().includes(term)
+      );
+    }
+
+    // Filter by priority
+    if (priority && priority !== 'All') {
+      filteredTasks = filteredTasks.filter(
+        (task) => task.priority === priority
+      );
+    }
+
+    // Filter by status
+    if (status && status !== 'All') {
+      filteredTasks = filteredTasks.filter(
+        (task) => task.status === status
+      );
+    }
+
+    res.status(200).json(filteredTasks);
   } catch (error) {
     res.status(500).json({
       message: 'Error fetching tasks',
@@ -12,6 +40,7 @@ exports.getAllTasks = (req, res) => {
     });
   }
 };
+
 
 // @desc    Create a new task
 // @route   POST /api/tasks
@@ -33,7 +62,6 @@ exports.createTask = (req, res) => {
       });
     }
 
-    // Create new task
     const newTask = {
       id: Date.now().toString(),
       title: title.trim(),
@@ -44,10 +72,8 @@ exports.createTask = (req, res) => {
       date: dueDate || new Date().toISOString().split('T')[0],
     };
 
-    // Add task to the task list
-    tasks.push(newTask);
+    mockStore.tasks.push(newTask);
 
-    // Return created task
     res.status(201).json(newTask);
   } catch (error) {
     res.status(500).json({
@@ -57,14 +83,15 @@ exports.createTask = (req, res) => {
   }
 };
 
+
 // @desc    Update a task by ID
 // @route   PUT /api/tasks/:id
 exports.updateTask = (req, res) => {
   try {
     const { id } = req.params;
 
-    const taskIndex = tasks.findIndex(
-      (task) => task.id === id
+    const taskIndex = mockStore.tasks.findIndex(
+      (task) => String(task.id) === String(id)
     );
 
     if (taskIndex === -1) {
@@ -73,13 +100,12 @@ exports.updateTask = (req, res) => {
       });
     }
 
-    // Update existing task
-    tasks[taskIndex] = {
-      ...tasks[taskIndex],
+    mockStore.tasks[taskIndex] = {
+      ...mockStore.tasks[taskIndex],
       ...req.body,
     };
 
-    res.status(200).json(tasks[taskIndex]);
+    res.status(200).json(mockStore.tasks[taskIndex]);
   } catch (error) {
     res.status(500).json({
       message: 'Error updating task',
@@ -88,19 +114,20 @@ exports.updateTask = (req, res) => {
   }
 };
 
+
 // @desc    Delete a task by ID
 // @route   DELETE /api/tasks/:id
 exports.deleteTask = (req, res) => {
   try {
     const { id } = req.params;
 
-    const initialLength = tasks.length;
+    const initialLength = mockStore.tasks.length;
 
-    tasks = tasks.filter(
-      (task) => task.id !== id
+    mockStore.tasks = mockStore.tasks.filter(
+      (task) => String(task.id) !== String(id)
     );
 
-    if (tasks.length === initialLength) {
+    if (mockStore.tasks.length === initialLength) {
       return res.status(404).json({
         message: 'Task not found',
       });
@@ -118,37 +145,7 @@ exports.deleteTask = (req, res) => {
   }
 };
 
-// Mock Task Data
-let tasks = [
-  { id: 1, title: 'Design Auth Screens', description: 'UI/UX layout', status: 'To Do', priority: 'High', assignee: 'Devindi' },
-  { id: 2, title: 'Setup Database', description: 'Backend integration', status: 'In Progress', priority: 'High', assignee: 'Chamod' },
-  { id: 3, title: 'Create Activity Feed', description: 'Frontend work', status: 'Done', priority: 'Medium', assignee: 'Tharunethu' }
-];
 
-const getTasks = (req, res) => {
-  let { search, priority, status } = req.query;
-  let filteredTasks = [...tasks];
-
-  // 1. Text Search (Matches title or description)
-  if (search) {
-    const term = search.toLowerCase();
-    filteredTasks = filteredTasks.filter(task => 
-      task.title.toLowerCase().includes(term) || 
-      task.description.toLowerCase().includes(term)
-    );
-  }
-
-  // 2. Priority Filter
-  if (priority && priority !== 'All') {
-    filteredTasks = filteredTasks.filter(task => task.priority === priority);
-  }
-
-  // 3. Status Filter
-  if (status && status !== 'All') {
-    filteredTasks = filteredTasks.filter(task => task.status === status);
-  }
-
-  res.status(200).json(filteredTasks);
-};
-
-module.exports = { getTasks };
+// Export search/filter function as an alias if another part
+// of the project expects getTasks.
+exports.getTasks = exports.getAllTasks;
