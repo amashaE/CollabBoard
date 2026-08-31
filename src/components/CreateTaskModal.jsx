@@ -11,6 +11,8 @@ function CreateTaskModal({ isOpen, onClose, onCreate }) {
     dueDate: '',
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   if (!isOpen) {
     return null;
   }
@@ -24,7 +26,7 @@ function CreateTaskModal({ isOpen, onClose, onCreate }) {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (!formData.title.trim()) {
@@ -32,21 +34,41 @@ function CreateTaskModal({ isOpen, onClose, onCreate }) {
       return;
     }
 
-    const newTask = {
-      id: Date.now(),
-      ...formData,
-    };
+    try {
+      setIsSubmitting(true);
 
-    onCreate(newTask);
+      const response = await fetch('http://localhost:5000/api/tasks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-    setFormData({
-      title: '',
-      description: '',
-      priority: 'Medium',
-      status: 'To Do',
-      assignee: '',
-      dueDate: '',
-    });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to create task');
+      }
+
+      onCreate(data);
+
+      setFormData({
+        title: '',
+        description: '',
+        priority: 'Medium',
+        status: 'To Do',
+        assignee: '',
+        dueDate: '',
+      });
+
+      alert('Task created successfully!');
+    } catch (error) {
+      console.error('Create task error:', error);
+      alert(`Failed to create task: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -72,8 +94,11 @@ function CreateTaskModal({ isOpen, onClose, onCreate }) {
         </div>
 
         <form onSubmit={handleSubmit}>
+
           <div className="form-group">
-            <label htmlFor="title">Task Title *</label>
+            <label htmlFor="title">
+              Task Title *
+            </label>
 
             <input
               id="title"
@@ -87,7 +112,9 @@ function CreateTaskModal({ isOpen, onClose, onCreate }) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="description">Description</label>
+            <label htmlFor="description">
+              Description
+            </label>
 
             <textarea
               id="description"
@@ -100,8 +127,11 @@ function CreateTaskModal({ isOpen, onClose, onCreate }) {
           </div>
 
           <div className="form-row">
+
             <div className="form-group">
-              <label htmlFor="priority">Priority</label>
+              <label htmlFor="priority">
+                Priority
+              </label>
 
               <select
                 id="priority"
@@ -116,7 +146,9 @@ function CreateTaskModal({ isOpen, onClose, onCreate }) {
             </div>
 
             <div className="form-group">
-              <label htmlFor="status">Status</label>
+              <label htmlFor="status">
+                Status
+              </label>
 
               <select
                 id="status"
@@ -125,15 +157,19 @@ function CreateTaskModal({ isOpen, onClose, onCreate }) {
                 onChange={handleChange}
               >
                 <option value="To Do">To Do</option>
-                <option value="Doing">Doing</option>
+                <option value="In Progress">In Progress</option>
                 <option value="Done">Done</option>
               </select>
             </div>
+
           </div>
 
           <div className="form-row">
+
             <div className="form-group">
-              <label htmlFor="assignee">Assignee</label>
+              <label htmlFor="assignee">
+                Assignee
+              </label>
 
               <input
                 id="assignee"
@@ -146,7 +182,9 @@ function CreateTaskModal({ isOpen, onClose, onCreate }) {
             </div>
 
             <div className="form-group">
-              <label htmlFor="dueDate">Due Date</label>
+              <label htmlFor="dueDate">
+                Due Date
+              </label>
 
               <input
                 id="dueDate"
@@ -156,21 +194,30 @@ function CreateTaskModal({ isOpen, onClose, onCreate }) {
                 onChange={handleChange}
               />
             </div>
+
           </div>
 
           <div className="modal-actions">
+
             <button
               type="button"
               className="cancel-button"
               onClick={onClose}
+              disabled={isSubmitting}
             >
               Cancel
             </button>
 
-            <button type="submit" className="create-button">
-              Create Task
+            <button
+              type="submit"
+              className="create-button"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Creating...' : 'Create Task'}
             </button>
+
           </div>
+
         </form>
       </div>
     </div>
