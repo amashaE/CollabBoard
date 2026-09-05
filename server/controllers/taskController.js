@@ -8,20 +8,25 @@ const VALID_STATUSES = ['To Do', 'In Progress', 'Done'];
 exports.getAllTasks = (req, res) => {
   try {
     const { search, priority, status } = req.query;
+    
+    // Create a copy of the mock store array to filter
     let filteredTasks = [...tasks];
 
+    // 1. Handle Search Filter (Matches title or description, case-insensitive)
     if (search) {
       const term = search.toLowerCase();
       filteredTasks = filteredTasks.filter((task) =>
-        task.title.toLowerCase().includes(term) ||
-        (task.description || '').toLowerCase().includes(term)
+        (task.title && task.title.toLowerCase().includes(term)) ||
+        (task.description && task.description.toLowerCase().includes(term))
       );
     }
 
+    // 2. Handle Priority Filter
     if (priority && priority !== 'All') {
       filteredTasks = filteredTasks.filter((task) => task.priority === priority);
     }
 
+    // 3. Handle Status Filter
     if (status && status !== 'All') {
       filteredTasks = filteredTasks.filter((task) => task.status === status);
     }

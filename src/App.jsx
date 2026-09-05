@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   BrowserRouter,
   Routes,
@@ -15,7 +15,39 @@ import UserProfile from './components/UserProfile';
 import './App.css';
 
 // Dashboard component defined directly inside App.jsx
-function Dashboard({ tasks, setIsCreateTaskOpen }) {
+function Dashboard({ tasks, setTasks, setIsCreateTaskOpen }) {
+  // State for search and filters
+  const [search, setSearch] = useState('');
+  const [status, setStatus] = useState('All');
+  const [priority, setPriority] = useState('All');
+
+  // Fetch tasks from backend whenever filters change
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const queryParams = new URLSearchParams();
+        if (search) queryParams.append('search', search);
+        if (status && status !== 'All') queryParams.append('status', status);
+        if (priority && priority !== 'All') queryParams.append('priority', priority);
+
+        const response = await fetch(`http://localhost:5000/api/tasks?${queryParams.toString()}`);
+        const data = await response.json();
+        
+        // Update the tasks state with filtered backend data
+        setTasks(data);
+      } catch (error) {
+        console.error("Failed to fetch tasks:", error);
+      }
+    };
+
+    // Use a small delay (debounce) so it doesn't spam the API on every single keystroke
+    const debounceTimer = setTimeout(() => {
+      fetchTasks();
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [search, status, priority, setTasks]);
+
   return (
     <main
       style={{
@@ -60,9 +92,58 @@ function Dashboard({ tasks, setIsCreateTaskOpen }) {
         </button>
       </div>
 
+      {/* SEARCH AND FILTER UI */}
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+        <input
+          type="text"
+          placeholder="Search tasks by title or description..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{
+            flex: 1,
+            padding: '10px 14px',
+            borderRadius: '8px',
+            border: '1px solid #e5e7eb',
+            fontSize: '14px'
+          }}
+        />
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          style={{
+            padding: '10px 14px',
+            borderRadius: '8px',
+            border: '1px solid #e5e7eb',
+            backgroundColor: '#fff',
+            fontSize: '14px'
+          }}
+        >
+          <option value="All">All Statuses</option>
+          <option value="To Do">To Do</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Done">Done</option>
+        </select>
+        <select
+          value={priority}
+          onChange={(e) => setPriority(e.target.value)}
+          style={{
+            padding: '10px 14px',
+            borderRadius: '8px',
+            border: '1px solid #e5e7eb',
+            backgroundColor: '#fff',
+            fontSize: '14px'
+          }}
+        >
+          <option value="All">All Priorities</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+      </div>
+
       {tasks.length > 0 ? (
-        <div style={{ marginTop: '20px' }}>
-          <h3>Created Tasks</h3>
+        <div>
+          <h3 style={{ marginBottom: '16px', color: '#374151' }}>Filtered Tasks</h3>
           {tasks.map((task) => (
             <div
               key={task.id}
@@ -84,28 +165,42 @@ function Dashboard({ tasks, setIsCreateTaskOpen }) {
                 <strong style={{ fontSize: '16px', color: '#1f2937' }}>
                   {task.title}
                 </strong>
-                <span
-                  style={{
-                    backgroundColor:
-                      task.priority === 'High'
-                        ? '#fee2e2'
-                        : task.priority === 'Medium'
-                        ? '#fef3c7'
-                        : '#dcfce7',
-                    color:
-                      task.priority === 'High'
-                        ? '#b91c1c'
-                        : task.priority === 'Medium'
-                        ? '#92400e'
-                        : '#166534',
-                    padding: '4px 10px',
-                    borderRadius: '20px',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                  }}
-                >
-                  {task.priority}
-                </span>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <span
+                    style={{
+                      backgroundColor: '#f3f4f6',
+                      color: '#4b5563',
+                      padding: '4px 10px',
+                      borderRadius: '20px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                    }}
+                  >
+                    {task.status}
+                  </span>
+                  <span
+                    style={{
+                      backgroundColor:
+                        task.priority === 'High'
+                          ? '#fee2e2'
+                          : task.priority === 'Medium'
+                          ? '#fef3c7'
+                          : '#dcfce7',
+                      color:
+                        task.priority === 'High'
+                          ? '#b91c1c'
+                          : task.priority === 'Medium'
+                          ? '#92400e'
+                          : '#166534',
+                      padding: '4px 10px',
+                      borderRadius: '20px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                    }}
+                  >
+                    {task.priority}
+                  </span>
+                </div>
               </div>
               {task.description && (
                 <p style={{ color: '#6b7280', fontSize: '14px', margin: '8px 0' }}>
@@ -123,10 +218,7 @@ function Dashboard({ tasks, setIsCreateTaskOpen }) {
             color: '#9ca3af',
           }}
         >
-          <p>No tasks created yet.</p>
-          <p>
-            Click <strong>+ Create Task</strong> to add your first task.
-          </p>
+          <p>No tasks found matching your filters.</p>
         </div>
       )}
     </main>
@@ -140,6 +232,7 @@ function App() {
   const handleCreateTask = (newTask) => {
     setTasks((previousTasks) => [...previousTasks, newTask]);
     setIsCreateTaskOpen(false);
+    // Note: You will eventually need to make a POST request here to save this new task to the backend API!
   };
 
   return (
@@ -285,6 +378,7 @@ function App() {
               element={
                 <Dashboard
                   tasks={tasks}
+                  setTasks={setTasks}
                   setIsCreateTaskOpen={setIsCreateTaskOpen}
                 />
               }
