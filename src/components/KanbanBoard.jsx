@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import TaskDetailsModal from './TaskDetailsModal';
+import SearchFilterBar from './SearchFilterBar';
 
 const columns = ['To Do', 'In Progress', 'Done'];
 
@@ -9,13 +10,22 @@ function KanbanBoard({ tasks: externalTasks, onTasksChange }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Get tasks from backend
+  // Search and filter state
+  const [filters, setFilters] = useState({
+    searchText: '',
+    priority: 'All',
+    status: 'All',
+  });
+
+  // Get tasks from MySQL backend
   useEffect(() => {
     const fetchTasks = async () => {
       try {
         setLoading(true);
 
-        const response = await fetch('http://localhost:5000/api/tasks');
+        const response = await fetch(
+          'http://localhost:5000/api/tasks'
+        );
 
         if (!response.ok) {
           throw new Error('Failed to fetch tasks');
@@ -48,8 +58,38 @@ function KanbanBoard({ tasks: externalTasks, onTasksChange }) {
     }
   }, [externalTasks]);
 
+  // Receive search/filter changes
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+  };
+
+  // Filter tasks for display only
+  const filteredTasks = tasks.filter((task) => {
+    const searchValue = filters.searchText.trim().toLowerCase();
+
+    const matchesSearch =
+      !searchValue ||
+      task.title?.toLowerCase().includes(searchValue) ||
+      task.description?.toLowerCase().includes(searchValue) ||
+      task.category?.toLowerCase().includes(searchValue) ||
+      task.assignee?.toLowerCase().includes(searchValue);
+
+    const matchesPriority =
+      filters.priority === 'All' ||
+      task.priority === filters.priority;
+
+    const matchesStatus =
+      filters.status === 'All' ||
+      task.status === filters.status;
+
+    return matchesSearch && matchesPriority && matchesStatus;
+  });
+
+  // Move task between Kanban columns
   const moveTask = async (taskId, direction) => {
-    const currentTask = tasks.find((task) => task.id === taskId);
+    const currentTask = tasks.find(
+      (task) => task.id === taskId
+    );
 
     if (!currentTask) {
       return;
@@ -102,6 +142,7 @@ function KanbanBoard({ tasks: externalTasks, onTasksChange }) {
     }
   };
 
+  // Save task changes from Task Details Modal
   const handleSaveTask = async (updatedTask) => {
     try {
       const response = await fetch(
@@ -138,6 +179,7 @@ function KanbanBoard({ tasks: externalTasks, onTasksChange }) {
     }
   };
 
+  // Priority badge styling
   const getPriorityBadgeStyle = (priority) => {
     switch (priority) {
       case 'High':
@@ -166,6 +208,7 @@ function KanbanBoard({ tasks: externalTasks, onTasksChange }) {
     }
   };
 
+  // Loading state
   if (loading) {
     return (
       <div
@@ -180,6 +223,7 @@ function KanbanBoard({ tasks: externalTasks, onTasksChange }) {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div
@@ -202,6 +246,7 @@ function KanbanBoard({ tasks: externalTasks, onTasksChange }) {
         minHeight: '100%',
       }}
     >
+      {/* Header */}
       <div
         style={{
           display: 'flex',
@@ -233,15 +278,22 @@ function KanbanBoard({ tasks: externalTasks, onTasksChange }) {
         </div>
       </div>
 
+      {/* Search and Filter Bar */}
+      <SearchFilterBar
+        onFilterChange={handleFilterChange}
+      />
+
+      {/* Kanban Columns */}
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
           gap: '16px',
+          marginTop: '20px',
         }}
       >
         {columns.map((column) => {
-          const columnTasks = tasks.filter(
+          const columnTasks = filteredTasks.filter(
             (task) => task.status === column
           );
 
@@ -256,6 +308,7 @@ function KanbanBoard({ tasks: externalTasks, onTasksChange }) {
                 minHeight: '400px',
               }}
             >
+              {/* Column Header */}
               <div
                 style={{
                   display: 'flex',
@@ -287,6 +340,7 @@ function KanbanBoard({ tasks: externalTasks, onTasksChange }) {
                 </span>
               </div>
 
+              {/* Tasks */}
               {columnTasks.map((task) => (
                 <div
                   key={task.id}
@@ -301,6 +355,7 @@ function KanbanBoard({ tasks: externalTasks, onTasksChange }) {
                     cursor: 'pointer',
                   }}
                 >
+                  {/* Task title + priority */}
                   <div
                     style={{
                       display: 'flex',
@@ -334,6 +389,7 @@ function KanbanBoard({ tasks: externalTasks, onTasksChange }) {
                     </span>
                   </div>
 
+                  {/* Category */}
                   <div
                     style={{
                       fontSize: '12px',
@@ -344,6 +400,7 @@ function KanbanBoard({ tasks: externalTasks, onTasksChange }) {
                     {task.category || 'General'}
                   </div>
 
+                  {/* Assignee + movement buttons */}
                   <div
                     style={{
                       display: 'flex',
@@ -354,7 +411,9 @@ function KanbanBoard({ tasks: externalTasks, onTasksChange }) {
                       marginTop: '12px',
                     }}
                   >
-                    <span>👤 {task.assignee || 'Unassigned'}</span>
+                    <span>
+                      👤 {task.assignee || 'Unassigned'}
+                    </span>
 
                     <div
                       style={{
@@ -362,6 +421,7 @@ function KanbanBoard({ tasks: externalTasks, onTasksChange }) {
                         gap: '4px',
                       }}
                     >
+                      {/* Move Left */}
                       {column !== 'To Do' && (
                         <button
                           type="button"
@@ -382,6 +442,7 @@ function KanbanBoard({ tasks: externalTasks, onTasksChange }) {
                         </button>
                       )}
 
+                      {/* Move Right */}
                       {column !== 'Done' && (
                         <button
                           type="button"
@@ -404,6 +465,7 @@ function KanbanBoard({ tasks: externalTasks, onTasksChange }) {
                     </div>
                   </div>
 
+                  {/* Details hint */}
                   <div
                     style={{
                       marginTop: '10px',
@@ -418,6 +480,7 @@ function KanbanBoard({ tasks: externalTasks, onTasksChange }) {
                 </div>
               ))}
 
+              {/* Empty column */}
               {columnTasks.length === 0 && (
                 <div
                   style={{
@@ -435,6 +498,7 @@ function KanbanBoard({ tasks: externalTasks, onTasksChange }) {
         })}
       </div>
 
+      {/* Task Details Modal */}
       <TaskDetailsModal
         task={selectedTask}
         isOpen={selectedTask !== null}
