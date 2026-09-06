@@ -1,70 +1,45 @@
-import { useState, useEffect } from 'react';
-
-const SearchAndFilter = ({ onFilterChange }) => {
-  const [search, setSearch] = useState('');
-  const [priority, setPriority] = useState('All');
-  const [status, setStatus] = useState('All');
-
-  useEffect(() => {
-    const fetchFilteredTasks = async () => {
-      const queryParams = new URLSearchParams({ search, priority, status }).toString();
-      const response = await fetch(`http://localhost:5000/api/tasks?${queryParams}`);
-      const data = await response.json();
-      onFilterChange(data);
-    };
-
-    fetchFilteredTasks();
-  }, [search, priority, status]);
-
-  return (
-    <div className="filter-bar">
-      <input 
-        type="text" 
-        placeholder="Search tasks..." 
-        value={search} 
-        onChange={(e) => setSearch(e.target.value)} 
-      />
-      <select value={priority} onChange={(e) => setPriority(e.target.value)}>
-        <option value="All">All Priorities</option>
-        <option value="High">High</option>
-        <option value="Medium">Medium</option>
-        <option value="Low">Low</option>
-      </select>
-      <select value={status} onChange={(e) => setStatus(e.target.value)}>
-        <option value="All">All Statuses</option>
-        <option value="To Do">To Do</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Done">Done</option>
-      </select>
-    </div>
-  );
-};
+import React, { useState } from 'react';
+import './SearchFilterBar.css';
 
 function SearchFilterBar({ onFilterChange }) {
   const [searchText, setSearchText] = useState('');
   const [priority, setPriority] = useState('All');
   const [status, setStatus] = useState('All');
 
-  const updateFilters = (next) => {
-    onFilterChange(next);
-  };
-
   const handleSearchChange = (event) => {
     const value = event.target.value;
+
     setSearchText(value);
-    updateFilters({ searchText: value, priority, status });
+
+    onFilterChange({
+      searchText: value,
+      priority,
+      status,
+    });
   };
 
   const handlePriorityChange = (event) => {
     const value = event.target.value;
+
     setPriority(value);
-    updateFilters({ searchText, priority: value, status });
+
+    onFilterChange({
+      searchText,
+      priority: value,
+      status,
+    });
   };
 
   const handleStatusChange = (event) => {
     const value = event.target.value;
+
     setStatus(value);
-    updateFilters({ searchText, priority, status: value });
+
+    onFilterChange({
+      searchText,
+      priority,
+      status: value,
+    });
   };
 
   return (
@@ -77,17 +52,25 @@ function SearchFilterBar({ onFilterChange }) {
         onChange={handleSearchChange}
       />
 
-      <select className="filter-select" value={priority} onChange={handlePriorityChange}>
+      <select
+        className="filter-select"
+        value={priority}
+        onChange={handlePriorityChange}
+      >
         <option value="All">All Priorities</option>
         <option value="Low">Low</option>
         <option value="Medium">Medium</option>
         <option value="High">High</option>
       </select>
 
-      <select className="filter-select" value={status} onChange={handleStatusChange}>
+      <select
+        className="filter-select"
+        value={status}
+        onChange={handleStatusChange}
+      >
         <option value="All">All Statuses</option>
         <option value="To Do">To Do</option>
-        <option value="Doing">Doing</option>
+        <option value="In Progress">In Progress</option>
         <option value="Done">Done</option>
       </select>
     </div>
