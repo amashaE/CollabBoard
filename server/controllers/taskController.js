@@ -1,25 +1,29 @@
-const db = require('../config/db');
+const mongoose = require('mongoose');
+const Task = require('../models/Task');
 
-// GET all tasks
+const formatTask = (task) => {
+  const taskObject = task.toObject ? task.toObject() : task;
+
+  return {
+    id: taskObject._id.toString(),
+    title: taskObject.title,
+    description: taskObject.description,
+    category: taskObject.category,
+    priority: taskObject.priority,
+    status: taskObject.status,
+    assignee: taskObject.assignee,
+    dueDate: taskObject.dueDate,
+    created_at: taskObject.createdAt,
+    updated_at: taskObject.updatedAt
+  };
+};
+
+// GET ALL TASKS
 exports.getAllTasks = async (req, res) => {
   try {
-    const [rows] = await db.query(`
-      SELECT
-        id,
-        title,
-        description,
-        category,
-        priority,
-        status,
-        assignee,
-        due_date AS dueDate,
-        created_at,
-        updated_at
-      FROM tasks
-      ORDER BY id DESC
-    `);
+    const tasks = await Task.find().sort({ createdAt: -1 });
 
-    res.status(200).json(rows);
+    res.status(200).json(tasks.map(formatTask));
   } catch (error) {
     console.error('Error fetching tasks:', error);
 
@@ -30,8 +34,7 @@ exports.getAllTasks = async (req, res) => {
   }
 };
 
-
-// CREATE a task
+// CREATE TASK
 exports.createTask = async (req, res) => {
   try {
     const {
@@ -41,7 +44,8 @@ exports.createTask = async (req, res) => {
       priority,
       status,
       assignee,
-      dueDate
+      dueDate,
+      date
     } = req.body;
 
     if (!title || !title.trim()) {
@@ -50,43 +54,17 @@ exports.createTask = async (req, res) => {
       });
     }
 
-    const [result] = await db.query(
-      `
-      INSERT INTO tasks
-      (title, description, category, priority, status, assignee, due_date)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-      `,
-      [
-        title.trim(),
-        description || null,
-        category || 'General',
-        priority || 'Medium',
-        status || 'To Do',
-        assignee || 'Unassigned',
-        dueDate || null
-      ]
-    );
+    const task = await Task.create({
+      title: title.trim(),
+      description: description || '',
+      category: category || 'General',
+      priority: priority || 'Medium',
+      status: status || 'To Do',
+      assignee: assignee || 'Unassigned',
+      dueDate: dueDate || date || null
+    });
 
-    const [rows] = await db.query(
-      `
-      SELECT
-        id,
-        title,
-        description,
-        category,
-        priority,
-        status,
-        assignee,
-        due_date AS dueDate,
-        created_at,
-        updated_at
-      FROM tasks
-      WHERE id = ?
-      `,
-      [result.insertId]
-    );
-
-    res.status(201).json(rows[0]);
+    res.status(201).json(formatTask(task));
   } catch (error) {
     console.error('Error creating task:', error);
 
@@ -97,11 +75,16 @@ exports.createTask = async (req, res) => {
   }
 };
 
-
-// UPDATE a task
+// UPDATE TASK
 exports.updateTask = async (req, res) => {
   try {
     const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: 'Invalid task ID'
+      });
+    }
 
     const {
       title,
@@ -110,60 +93,41 @@ exports.updateTask = async (req, res) => {
       priority,
       status,
       assignee,
-      dueDate
+      dueDate,
+      date
     } = req.body;
 
-    const [result] = await db.query(
-      `
-      UPDATE tasks
-      SET
-        title = COALESCE(?, title),
-        description = COALESCE(?, description),
-        category = COALESCE(?, category),
-        priority = COALESCE(?, priority),
-        status = COALESCE(?, status),
-        assignee = COALESCE(?, assignee),
-        due_date = COALESCE(?, due_date)
-      WHERE id = ?
-      `,
-      [
-        title,
-        description,
-        category,
-        priority,
-        status,
-        assignee,
-        dueDate,
-        id
-      ]
+    const updateData = {};
+
+    if (title !== undefined) updateData.title = title.trim();
+    if (description !== undefined) updateData.description = description;
+    if (category !== undefined) updateData.category = category;
+    if (priority !== undefined) updateData.priority = priority;
+    if (status !== undefined) updateData.status = status;
+    if (assignee !== undefined) updateData.assignee = assignee;
+
+    if (dueDate !== undefined) {
+      updateData.dueDate = dueDate;
+    } else if (date !== undefined) {
+      updateData.dueDate = date;
+    }
+
+    const task = await Task.findByIdAndUpdate(
+      id,
+      updateData,
+      {
+        new: true,
+        runValidators: true
+      }
     );
 
-    if (result.affectedRows === 0) {
+    if (!task) {
       return res.status(404).json({
         message: 'Task not found'
       });
     }
 
-    const [rows] = await db.query(
-      `
-      SELECT
-        id,
-        title,
-        description,
-        category,
-        priority,
-        status,
-        assignee,
-        due_date AS dueDate,
-        created_at,
-        updated_at
-      FROM tasks
-      WHERE id = ?
-      `,
-      [id]
-    );
-
-    res.status(200).json(rows[0]);
+    res.status(200).json(formatTask(task));
   } catch (error) {
     console.error('Error updating task:', error);
 
@@ -174,18 +138,64 @@ exports.updateTask = async (req, res) => {
   }
 };
 
+// UPDATE TASK STATUS
+exports.updateTaskStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
 
-// DELETE a task
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: 'Invalid task ID'
+      });
+    }
+
+    if (!['To Do', 'In Progress', 'Done'].includes(status)) {
+      return res.status(400).json({
+        message: 'Invalid status'
+      });
+    }
+
+    const task = await Task.findByIdAndUpdate(
+      id,
+      { status },
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+
+    if (!task) {
+      return res.status(404).json({
+        message: 'Task not found'
+      });
+    }
+
+    res.status(200).json(formatTask(task));
+  } catch (error) {
+    console.error('Error updating task status:', error);
+
+    res.status(500).json({
+      message: 'Error updating task status',
+      error: error.message
+    });
+  }
+};
+
+// DELETE TASK
 exports.deleteTask = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const [result] = await db.query(
-      'DELETE FROM tasks WHERE id = ?',
-      [id]
-    );
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: 'Invalid task ID'
+      });
+    }
 
-    if (result.affectedRows === 0) {
+    const task = await Task.findByIdAndDelete(id);
+
+    if (!task) {
       return res.status(404).json({
         message: 'Task not found'
       });
