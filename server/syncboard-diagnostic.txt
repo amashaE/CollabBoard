@@ -1,0 +1,467 @@
+﻿================ SERVER DIAGNOSTIC ================
+
+================ CURRENT LOCATION ================
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server
+
+================ FILE STRUCTURE ================
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\package-lock.json
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\package.json
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\server-output.txt
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\server.js
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\Task.js
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\config\db.js
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\config\mongodb.js
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\controllers\calendarController.js
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\controllers\dashboardController.js
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\controllers\taskController.js
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\controllers\teamController.js
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\data\activity.js
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\data\mockStore.js
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\data\notifications.js
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\models\Task.js
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\routes\activityRoutes.js
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\routes\calendarRoutes.js
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\routes\dashboardRoutes.js
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\routes\notificationRoutes.js
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\routes\taskRoutes.js
+C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server\routes\teamRoutes.js
+
+================ PACKAGE.JSON ================
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.9.5",
+    "mysql2": "^3.24.3"
+  }
+}
+
+================ SERVER.JS ================
+const express = require('express');
+const cors = require('cors');
+require('dotenv').config();
+
+const dns = require('dns');
+
+// Use reliable DNS servers for MongoDB Atlas SRV lookup
+dns.setServers(['8.8.8.8', '1.1.1.1']);
+
+const connectMongoDB = require('./config/mongodb');
+
+const taskRoutes = require('./routes/taskRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+const activityRoutes = require('./routes/activityRoutes');
+const teamRoutes = require('./routes/teamRoutes');
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// ================================
+// Middleware
+// ================================
+app.use(cors());
+app.use(express.json());
+
+// ================================
+// API Routes
+// ================================
+app.use('/api/tasks', taskRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/activity', activityRoutes);
+app.use('/api/team', teamRoutes);
+
+// ================================
+// Root Health Check
+// ================================
+app.get('/', (req, res) => {
+  res.send('SyncBoard REST API is running...');
+});
+
+// ================================
+// Start Server
+// ================================
+const startServer = async () => {
+  try {
+    await connectMongoDB();
+
+    app.listen(PORT, () => {
+      console.log(`Backend server running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error.message);
+    process.exit(1);
+  }
+};
+
+startServer();
+
+================ MONGODB CONFIG ================
+const mongoose = require('mongoose');
+
+const connectMongoDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+
+    console.log('MongoDB connected successfully');
+  } catch (error) {
+    console.error('MongoDB connection failed:', error.message);
+    process.exit(1);
+  }
+};
+
+module.exports = connectMongoDB;
+
+================ TASK MODEL ================
+const mongoose = require('mongoose');
+
+const taskSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+      trim: true
+    },
+
+    description: {
+      type: String,
+      default: ''
+    },
+
+    category: {
+      type: String,
+      default: 'General'
+    },
+
+    priority: {
+      type: String,
+      enum: ['Low', 'Medium', 'High'],
+      default: 'Medium'
+    },
+
+    status: {
+      type: String,
+      enum: ['To Do', 'In Progress', 'Done'],
+      default: 'To Do'
+    },
+
+    assignee: {
+      type: String,
+      default: 'Unassigned'
+    },
+
+    dueDate: {
+      type: Date,
+      default: null
+    }
+  },
+  {
+    timestamps: true
+  }
+);
+
+module.exports = mongoose.model('Task', taskSchema);
+
+================ TASK CONTROLLER ================
+const mongoose = require('mongoose');
+const Task = require('../models/Task');
+
+// Convert MongoDB task into the format expected by the frontend
+const formatTask = (task) => {
+  const taskObject = task.toObject ? task.toObject() : task;
+
+  return {
+    id: taskObject._id.toString(),
+    title: taskObject.title,
+    description: taskObject.description,
+    category: taskObject.category,
+    priority: taskObject.priority,
+    status: taskObject.status,
+    assignee: taskObject.assignee,
+    dueDate: taskObject.dueDate,
+    created_at: taskObject.createdAt,
+    updated_at: taskObject.updatedAt
+  };
+};
+
+
+// GET all tasks
+exports.getAllTasks = async (req, res) => {
+  try {
+    const tasks = await Task.find().sort({ createdAt: -1 });
+
+    res.status(200).json(tasks.map(formatTask));
+  } catch (error) {
+    console.error('Error fetching tasks:', error);
+
+    res.status(500).json({
+      message: 'Error fetching tasks',
+      error: error.message
+    });
+  }
+};
+
+
+// CREATE a task
+exports.createTask = async (req, res) => {
+  try {
+    const {
+      title,
+      description,
+      category,
+      priority,
+      status,
+      assignee,
+      dueDate,
+      date
+    } = req.body;
+
+    if (!title || !title.trim()) {
+      return res.status(400).json({
+        message: 'Task title is required'
+      });
+    }
+
+    const task = await Task.create({
+      title: title.trim(),
+      description: description || '',
+      category: category || 'General',
+      priority: priority || 'Medium',
+      status: status || 'To Do',
+      assignee: assignee || 'Unassigned',
+      dueDate: dueDate || date || null
+    });
+
+    res.status(201).json(formatTask(task));
+  } catch (error) {
+    console.error('Error creating task:', error);
+
+    res.status(500).json({
+      message: 'Error creating task',
+      error: error.message
+    });
+  }
+};
+
+
+// UPDATE a task
+exports.updateTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: 'Invalid task ID'
+      });
+    }
+
+    const {
+      title,
+      description,
+      category,
+      priority,
+      status,
+      assignee,
+      dueDate,
+      date
+    } = req.body;
+
+    const updateData = {};
+
+    if (title !== undefined) updateData.title = title.trim();
+    if (description !== undefined) updateData.description = description;
+    if (category !== undefined) updateData.category = category;
+    if (priority !== undefined) updateData.priority = priority;
+    if (status !== undefined) updateData.status = status;
+    if (assignee !== undefined) updateData.assignee = assignee;
+    if (dueDate !== undefined) updateData.dueDate = dueDate;
+    if (date !== undefined) updateData.dueDate = date;
+
+    const task = await Task.findByIdAndUpdate(
+      id,
+      updateData,
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+
+    if (!task) {
+      return res.status(404).json({
+        message: 'Task not found'
+      });
+    }
+
+    res.status(200).json(formatTask(task));
+  } catch (error) {
+    console.error('Error updating task:', error);
+
+    res.status(500).json({
+      message: 'Error updating task',
+      error: error.message
+    });
+  }
+};
+
+
+// UPDATE only the task status
+exports.updateTaskStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: 'Invalid task ID'
+      });
+    }
+
+    if (!['To Do', 'In Progress', 'Done'].includes(status)) {
+      return res.status(400).json({
+        message: 'Invalid status'
+      });
+    }
+
+    const task = await Task.findByIdAndUpdate(
+      id,
+      { status },
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+
+    if (!task) {
+      return res.status(404).json({
+        message: 'Task not found'
+      });
+    }
+
+    res.status(200).json(formatTask(task));
+  } catch (error) {
+    console.error('Error updating task status:', error);
+
+    res.status(500).json({
+      message: 'Error updating task status',
+      error: error.message
+    });
+  }
+};
+
+
+// DELETE a task
+exports.deleteTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: 'Invalid task ID'
+      });
+    }
+
+    const task = await Task.findByIdAndDelete(id);
+
+    if (!task) {
+      return res.status(404).json({
+        message: 'Task not found'
+      });
+    }
+
+    res.status(200).json({
+      message: 'Task deleted successfully',
+      id
+    });
+  } catch (error) {
+    console.error('Error deleting task:', error);
+
+    res.status(500).json({
+      message: 'Error deleting task',
+      error: error.message
+    });
+  }
+};
+
+================ TASK ROUTES ================
+const express = require('express');
+const router = express.Router();
+const taskController = require('../controllers/taskController');
+
+// Task CRUD routes
+router.get('/', taskController.getAllTasks);
+router.post('/', taskController.createTask);
+router.put('/:id', taskController.updateTask);
+router.patch('/:id/status', taskController.updateTaskStatus);
+router.delete('/:id', taskController.deleteTask);
+
+module.exports = router;
+
+================ ENVIRONMENT CHECK ================
+MONGODB_URI exists: False
+PORT exists: False
+
+================ INSTALLED PACKAGES ================
+server@1.0.0 C:\Users\ASUS\OneDrive - NSBM\Desktop\FS group activity\CollabBoard\server
+Γö£ΓöÇΓöÇ bcryptjs@3.0.3
+Γö£ΓöÇΓöÇ cors@2.8.6
+Γö£ΓöÇΓöÇ dotenv@17.4.2
+Γö£ΓöÇΓöÇ express@5.2.1
+Γö£ΓöÇΓöÇ jsonwebtoken@9.0.3
+Γö£ΓöÇΓöÇ mongoose@9.9.5
+ΓööΓöÇΓöÇ mysql2@3.24.3
+
+
+================ NODE VERSION ================
+v24.18.1
+
+================ NPM VERSION ================
+11.16.0
+
+================ DNS TEST ================
+node : querySrv ECONNREFUSED _mongodb._tcp.cluster0.m68ojqc.mongodb.net
+At line:47 char:6
++     (node -e "require('dns').promises.resolveSrv('_mongodb._tcp.clust ...
++      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (querySrv ECONNR...jqc.mongodb.net:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+================ DNS TEST WITH GOOGLE/CLOUDFLARE ================
+[
+  {
+    name: 'ac-fhlvdmp-shard-00-00.m68ojqc.mongodb.net',
+    port: 27017,
+    priority: 0,
+    weight: 0,
+    type: 'SRV'
+  },
+  {
+    name: 'ac-fhlvdmp-shard-00-01.m68ojqc.mongodb.net',
+    port: 27017,
+    priority: 0,
+    weight: 0,
+    type: 'SRV'
+  },
+  {
+    name: 'ac-fhlvdmp-shard-00-02.m68ojqc.mongodb.net',
+    port: 27017,
+    priority: 0,
+    weight: 0,
+    type: 'SRV'
+  }
+]
+
+================ END ================

@@ -4,35 +4,6 @@ const taskSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-<<<<<<< HEAD
-      required: [true, 'Task title is required'],
-      trim: true,
-    },
-    description: {
-      type: String,
-      default: '',
-    },
-    status: {
-      type: String,
-      enum: ['todo', 'in-progress', 'completed'],
-      default: 'todo',
-    },
-    priority: {
-      type: String,
-      enum: ['low', 'medium', 'high'],
-      default: 'medium',
-    },
-    assignedTo: {
-      type: String,
-      default: 'Unassigned',
-    },
-    dueDate: {
-      type: Date,
-    },
-  },
-  {
-    timestamps: true, // Automatically adds createdAt and updatedAt fields
-=======
       required: true,
       trim: true
     },
@@ -71,7 +42,6 @@ const taskSchema = new mongoose.Schema(
   },
   {
     timestamps: true
->>>>>>> 02dbb0dd41c4385cf6f4c775bbc64db8d030eb4a
   }
 );
 
