@@ -1,78 +1,11 @@
 const mongoose = require('mongoose');
 
-const taskSchema = new mongoose.Schema(
-  {
-    title: {
-      type: String,
-<<<<<<< HEAD
-      required: [true, 'Task title is required'],
-      trim: true,
-    },
-    description: {
-      type: String,
-      default: '',
-    },
-    status: {
-      type: String,
-      enum: ['todo', 'in-progress', 'completed'],
-      default: 'todo',
-    },
-    priority: {
-      type: String,
-      enum: ['low', 'medium', 'high'],
-      default: 'medium',
-    },
-    assignedTo: {
-      type: String,
-      default: 'Unassigned',
-    },
-    dueDate: {
-      type: Date,
-    },
-  },
-  {
-    timestamps: true, // Automatically adds createdAt and updatedAt fields
-=======
-      required: true,
-      trim: true
-    },
-
-    description: {
-      type: String,
-      default: ''
-    },
-
-    category: {
-      type: String,
-      default: 'General'
-    },
-
-    priority: {
-      type: String,
-      enum: ['Low', 'Medium', 'High'],
-      default: 'Medium'
-    },
-
-    status: {
-      type: String,
-      enum: ['To Do', 'In Progress', 'Done'],
-      default: 'To Do'
-    },
-
-    assignee: {
-      type: String,
-      default: 'Unassigned'
-    },
-
-    dueDate: {
-      type: Date,
-      default: null
-    }
-  },
-  {
-    timestamps: true
->>>>>>> 02dbb0dd41c4385cf6f4c775bbc64db8d030eb4a
-  }
-);
+const taskSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String, default: '' },
+  status: { type: String, enum: ['todo', 'in_progress', 'completed'], default: 'todo' },
+  priority: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' },
+  assignedTo: { type: String, default: 'Unassigned' }
+}, { timestamps: true });
 
 module.exports = mongoose.model('Task', taskSchema);
